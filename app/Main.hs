@@ -1,6 +1,9 @@
 module Main where
 
-import Lib
+import Codec.Compression.Brotli
+import Data.ByteString.Lazy as LB
 
 main :: IO ()
-main = someFunc
+main = do
+    stuff <- LB.getContents
+    LB.putStr $ compress stuff
