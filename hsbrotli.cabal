@@ -1,0 +1,66 @@
+name:                hsbrotli
+version:             0.1.0.0
+synopsis:            A brotli wrapper for Haskell
+description:         Please see README.md
+homepage:            https://www.shimmercat.com/en/info/open-source/
+license:             BSD3
+license-file:        LICENSE
+author:              Zunzun AB
+maintainer:          alcidesv@zunzun.se
+copyright:           2016 Zunzun AB
+category:            Web
+build-type:          Simple
+-- extra-source-files:
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Lib
+  build-depends:       base >= 4.7 && < 5
+  default-language:    Haskell2010
+  include-dirs:        cbits/
+
+
+  c-sources:           cbits/dec/bit_reader.c
+                       cbits/dec/decode.c
+                       cbits/dec/huffman.c
+                       cbits/dec/state.c
+                       --
+                       cbits/enc/backward_references.c
+                       cbits/enc/bit_cost.c
+                       cbits/enc/block_splitter.c
+                       cbits/enc/brotli_bit_stream.c
+                       cbits/enc/cluster.c
+                       cbits/enc/compress_fragment.c
+                       cbits/enc/compress_fragment_two_pass.c
+                       cbits/enc/encode.c
+                       cbits/enc/entropy_encode.c
+                       cbits/enc/histogram.c
+                       cbits/enc/literal_cost.c
+                       cbits/enc/memory.c
+                       cbits/enc/metablock.c
+                       cbits/enc/static_dict.c
+                       cbits/enc/utf8_util.c
+                       --
+                       cbits/common/dictionary.c
+
+executable brotli-exe
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , hsbrotli
+  default-language:    Haskell2010
+
+test-suite brotli-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base
+                     , hsbrotli
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/githubuser/simple

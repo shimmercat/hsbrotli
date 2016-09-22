@@ -1,0 +1,8 @@
+resolver: nightly-2016-05-31
+packages:
+- '.'
+extra-deps: []
+flags: {}
+
+# Extra package databases containing global packages
+extra-package-dbs: []
