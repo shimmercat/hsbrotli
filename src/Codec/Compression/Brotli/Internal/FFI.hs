@@ -49,9 +49,9 @@ foreign import ccall "&BrotliEncoderDestroyInstance" enc_destroy_instance::
     FunPtr( EncoderInstancePtr -> IO () )
 
 
-foreign import ccall "BrotliEncoderCompress" enc_compress ::
+foreign import ccall "BrotliEncoderCompressStream" enc_compress ::
     EncoderInstancePtr ->  --
-    CInt ->  -- operation
+    Word8 ->  -- operation
     Ptr CSize ->  -- available_in,
     Ptr (Ptr Word8) -> --  next_in
     Ptr CSize  -> -- available out,
@@ -92,6 +92,7 @@ encAddInput
                 alloca $ \ ppnext_in ->  do
                     --
                     --
+                    --putStrLn $ " incoming " ++ show strlen
                     poke csize_avail_in (fromIntegral strlen :: CSize)
                     poke ppnext_in (castPtr pcchar :: Ptr Word8)
                     goIter
@@ -145,16 +146,26 @@ goIter op ep csize_avail_in ppnext_in =
                       then do
                         avail_in <- peek csize_avail_in
                         new_pnext_out <- peek ppnext_out
-                        total_out <- peek ptotal_out
-                        if | avail_in > 0 && total_out == 0     -> error "BrotliCompressUnexpectedCase"
-                           | avail_in == 0 && total_out == 0    -> return []
-                           | avail_in < 0 || total_out < 0      -> error "SomebodyFCKDHardAroundBrotli"
+                        let
+                            out_now = minusPtr new_pnext_out pnext_out
+                        has_more_output <- (fmap (/= 0) ) (enc_has_more_output ep)
+
+                        --putStrLn $ "total_out: " ++ show out_now
+                        --putStrLn $ "avail_in: " ++ show avail_in
+                        if | avail_in > 0 && out_now == 0     -> error "BrotliCompressUnexpectedCase"
+                           | avail_in == 0 && out_now == 0    -> return []
+                           | avail_in < 0 || out_now < 0      -> error "SomebodyFCKDHardAroundBrotli"
                            | avail_in > 0                       -> do
-                                                                       new_str <- B.packCStringLen (castPtr pnext_out,  fromIntegral total_out)
+                                                                       new_str <- B.packCStringLen (castPtr pnext_out,  fromIntegral out_now)
                                                                        rest_of_list <- goIter op ep csize_avail_in ppnext_in
                                                                        return (new_str:rest_of_list)
-                           | avail_in == 0                      -> do
-                                                                       new_str <- B.packCStringLen (castPtr pnext_out,  fromIntegral total_out)
+                           | avail_in == 0 && op /=0 && has_more_output
+                                                                 -> do
+                                                                       new_str <- B.packCStringLen (castPtr pnext_out,  fromIntegral out_now)
+                                                                       rest_of_list <- goIter op ep csize_avail_in ppnext_in
+                                                                       return (new_str:rest_of_list)
+                           | avail_in == 0                       -> do
+                                                                       new_str <- B.packCStringLen (castPtr pnext_out,  fromIntegral out_now)
                                                                        return [new_str]
                       else
                         error "Brotli got stuck"

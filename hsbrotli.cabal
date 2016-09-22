@@ -26,6 +26,7 @@ library
                        transformers >= 0.5 && < 0.6
   default-language:    Haskell2010
   include-dirs:        cbits/
+  ghc-options:         -g "-optc -g"
 
 
   c-sources:           cbits/dec/bit_reader.c
@@ -54,7 +55,7 @@ library
 executable brotli-exe
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -g -with-rtsopts=-N "-optc -g"
   build-depends:       base
                      , hsbrotli
                      , bytestring
@@ -66,7 +67,7 @@ test-suite brotli-test
   main-is:             Spec.hs
   build-depends:       base
                      , hsbrotli
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -g -with-rtsopts=-N
   default-language:    Haskell2010
 
 source-repository head

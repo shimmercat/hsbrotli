@@ -178,7 +178,7 @@ BROTLI_BOOL BrotliEncoderCompress(
    Returns false if there was an error and true otherwise.
 */
 BROTLI_BOOL BrotliEncoderCompressStream(
-    BrotliEncoderState* s, BrotliEncoderOperation op, size_t* available_in,
+    BrotliEncoderState* s, /*BrotliEncoderOperation*/ uint8_t op, size_t* available_in,
     const uint8_t** next_in, size_t* available_out, uint8_t** next_out,
     size_t* total_out);
 

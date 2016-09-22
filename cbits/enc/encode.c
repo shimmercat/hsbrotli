@@ -1556,7 +1556,7 @@ static BROTLI_BOOL ProcessMetadata(
 }
 
 BROTLI_BOOL BrotliEncoderCompressStream(
-    BrotliEncoderState* s, BrotliEncoderOperation op, size_t* available_in,
+    BrotliEncoderState* s, uint8_t op, size_t* available_in,
     const uint8_t** next_in, size_t* available_out,uint8_t** next_out,
     size_t* total_out) {
   if (!EnsureInitialized(s)) return BROTLI_FALSE;
